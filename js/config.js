@@ -19,8 +19,8 @@
 // ============================================================
 // SUPABASE - Edite aqui com seus dados reais
 // ============================================================
-window.SUPABASE_FUNCTIONS_URL = 'https://SEU-PROJETO.supabase.co/functions/v1/sorteio-api';
-window.SUPABASE_ANON_KEY = 'SUA-CHAVE-ANON-AQUI';
+window.SUPABASE_FUNCTIONS_URL = 'https://thsiktvrpisbhgvihsio.supabase.co/functions/v1/sorteio-api';
+window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoc2lrdHZycGlzYmhndmloc2lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwODg2ODksImV4cCI6MjA5MDY2NDY4OX0.jd5_J0gjXIAWR_PjtVbr8diFoXWtVxaSwRZPkgBzH1o';
 
 // ============================================================
 // CONFIGURAÇÕES GERAIS
