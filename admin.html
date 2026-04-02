@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin — Gire &amp; Ganhe</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/config.js"></script>
+</head>
+<body class="admin-body">
+
+<!-- Mobile Toggle -->
+<button class="admin-mobile-toggle" id="adminMobileToggle">☰</button>
+
+<!-- SIDEBAR -->
+<nav class="admin-sidebar" id="adminSidebar">
+  <div class="logo">🎰 Gire &amp; Ganhe<br><small style="font-size:.7rem;color:#A0A0B0;font-weight:400">Painel Admin</small></div>
+  <div class="admin-nav">
+    <a href="#" data-page="dashboard" class="active">📊 Dashboard</a>
+    <a href="#" data-page="campaigns">🚀 Campanhas</a>
+    <a href="#" data-page="prizes">🎁 Prêmios &amp; Roleta</a>
+    <a href="#" data-page="reports">📋 Relatórios</a>
+    <a href="#" data-page="settings">⚙️ Configurações</a>
+  </div>
+  <div style="margin-top:auto;padding:16px 20px;">
+    <button class="btn btn-secondary btn-sm" id="btnLogout" style="width:100%">🚪 Sair</button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="admin-main">
+
+  <!-- ===== DASHBOARD ===== -->
+  <div class="admin-page active" id="page-dashboard">
+    <div class="page-title">Dashboard</div>
+    <div class="page-subtitle">Visão geral da operação em tempo real</div>
+
+    <div class="stats-grid">
+      <div class="stat-card purple">
+        <div class="stat-icon">🎰</div>
+        <div class="stat-value" id="statTotalSpins">0</div>
+        <div class="stat-label">Total de Giros</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">📅</div>
+        <div class="stat-value" id="statTodaySpins">0</div>
+        <div class="stat-label">Giros Hoje</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-icon">🎁</div>
+        <div class="stat-value" id="statPrizesGiven">0</div>
+        <div class="stat-label">Prêmios Distribuídos</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-icon">🚀</div>
+        <div class="stat-value" id="statActiveCampaigns">0</div>
+        <div class="stat-label">Campanhas Ativas</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:16px">⚡ Atividade Recente</h3>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Data/Hora</th><th>Telefone</th><th>Campanha</th><th>Resultado</th><th>Tipo</th>
+            </tr>
+          </thead>
+          <tbody id="recentActivityBody">
+            <tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="text-align:center;margin-top:12px">
+        <button class="btn btn-secondary btn-sm" onclick="navigateTo('reports')">Ver todos os relatórios →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CAMPANHAS ===== -->
+  <div class="admin-page" id="page-campaigns">
+    <div class="page-title">Campanhas</div>
+    <div class="page-subtitle">Gerencie suas campanhas promocionais</div>
+
+    <button class="btn btn-primary btn-sm" id="btnNewCampaign" style="margin-bottom:20px">+ Nova Campanha</button>
+
+    <div id="campaignList">
+      <p style="color:var(--text-muted);text-align:center;padding:40px">Carregando campanhas...</p>
+    </div>
+  </div>
+
+  <!-- ===== PRÊMIOS & ROLETA ===== -->
+  <div class="admin-page" id="page-prizes">
+    <div class="page-title">Prêmios &amp; Roleta</div>
+    <div class="page-subtitle">Configure os espaços da roleta e as regras de distribuição</div>
+
+    <div id="prizesPlaceholder" style="display:none">
+      <div class="card" style="text-align:center;padding:40px">
+        <div style="font-size:3rem;margin-bottom:12px">🎁</div>
+        <p>Selecione uma campanha na aba "Campanhas" e clique em "Prêmios" para gerenciar.</p>
+        <button class="btn btn-primary btn-sm" style="margin-top:16px" onclick="navigateTo('campaigns')">Ir para Campanhas</button>
+      </div>
+    </div>
+
+    <div id="prizesContent">
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
+
+        <!-- Lista de prêmios -->
+        <div style="flex:1;min-width:300px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <h3>Espaços da Roleta</h3>
+            <button class="btn btn-primary btn-sm" id="btnNewPrize">+ Novo Item</button>
+          </div>
+          <div id="prizeList"></div>
+        </div>
+
+        <!-- Preview da roleta -->
+        <div style="flex:0 0 300px">
+          <h3 style="margin-bottom:12px;text-align:center">Preview da Roleta</h3>
+          <div class="roulette-preview">
+            <div style="position:relative;display:flex;flex-direction:column;align-items:center">
+              <div style="font-size:1.5rem;margin-bottom:-8px;z-index:10">▼</div>
+              <canvas id="adminRouletteCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RELATÓRIOS ===== -->
+  <div class="admin-page" id="page-reports">
+    <div class="page-title">Relatórios</div>
+    <div class="page-subtitle">Participações, prêmios e resgates</div>
+
+    <!-- Resgate de código -->
+    <div class="card" style="margin-bottom:20px">
+      <h3 style="margin-bottom:12px">🔍 Validar Código de Resgate</h3>
+      <div style="display:flex;gap:10px">
+        <input type="text" id="redeemInput" class="form-control" placeholder="Digite o código" style="flex:1;text-transform:uppercase">
+        <button class="btn btn-success btn-sm" onclick="redeemCode()">✅ Validar</button>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="form-grid">
+        <div>
+          <label class="form-label">Campanha</label>
+          <select class="form-control" id="reportCampaignFilter">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">De</label>
+          <input type="date" class="form-control" id="reportDateFrom">
+        </div>
+        <div>
+          <label class="form-label">Até</label>
+          <input type="date" class="form-control" id="reportDateTo">
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button class="btn btn-primary btn-sm" onclick="loadReports()" style="width:100%">🔍 Filtrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumo -->
+    <div class="stats-grid" style="margin-bottom:20px">
+      <div class="stat-card"><div class="stat-value" id="reportTotal">0</div><div class="stat-label">Total participações</div></div>
+      <div class="stat-card"><div class="stat-value" id="reportPrizes">0</div><div class="stat-label">Prêmios sorteados</div></div>
+      <div class="stat-card"><div class="stat-value" id="reportRedeemed">0</div><div class="stat-label">Prêmios resgatados</div></div>
+      <div class="stat-card"><div class="stat-value" id="reportUniquePhones">0</div><div class="stat-label">Números únicos</div></div>
+    </div>
+
+    <!-- Tabela -->
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data/Hora</th><th>Telefone</th><th>Campanha</th><th>Resultado</th>
+            <th>Código</th><th>Status</th><th>Resgatado em</th>
+          </tr>
+        </thead>
+        <tbody id="reportTableBody">
+          <tr><td colspan="7" style="text-align:center;color:var(--text-muted)">Use os filtros acima para buscar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== CONFIGURAÇÕES ===== -->
+  <div class="admin-page" id="page-settings">
+    <div class="page-title">Configurações</div>
+    <div class="page-subtitle">Integrações e configurações do sistema</div>
+
+    <div class="card">
+      <h3 style="margin-bottom:20px">🔗 Supabase (Backend)</h3>
+      <div class="form-grid">
+        <div class="form-full">
+          <label class="form-label">URL do Projeto Supabase</label>
+          <input type="text" class="form-control" id="settingApiUrl" placeholder="https://xxxx.supabase.co">
+        </div>
+        <div class="form-full">
+          <label class="form-label">Chave Anon (anon key)</label>
+          <input type="text" class="form-control" id="settingAnonKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:20px">💬 Motor WhatsApp</h3>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px">
+        Configure aqui a URL do seu motor WhatsApp (Evolution API, WPPConnect, Z-API, etc.)
+        que enviará os webhooks de entrada no grupo para o backend.
+      </p>
+      <div class="form-grid">
+        <div class="form-full">
+          <label class="form-label">URL do Webhook WhatsApp</label>
+          <input type="text" class="form-control" id="settingWaApiUrl" placeholder="https://sua-api-whatsapp.com">
+        </div>
+        <div class="form-full">
+          <label class="form-label">API Key do Motor WhatsApp</label>
+          <input type="password" class="form-control" id="settingWaApiKey" placeholder="Chave de autenticação">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:20px">🔐 Segurança</h3>
+      <div>
+        <label class="form-label">Nova Senha do Painel Admin</label>
+        <input type="password" class="form-control" id="settingAdminPwd" placeholder="Deixe em branco para não alterar">
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-sm" onclick="saveSettings()">💾 Salvar Configurações</button>
+  </div>
+
+</main><!-- /admin-main -->
+
+<!-- ===== MODAIS ===== -->
+
+<!-- Login -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <div class="modal-title">🔐 Acesso Admin</div>
+    </div>
+    <div class="input-group">
+      <label class="form-label">Senha</label>
+      <input type="password" class="form-control" id="adminPassword" placeholder="Digite a senha do painel">
+      <div style="color:#E74C3C;font-size:0.8rem;margin-top:6px" id="loginError"></div>
+    </div>
+    <button class="btn btn-primary" id="btnAdminLogin">Entrar</button>
+  </div>
+</div>
+
+<!-- Modal Campanha -->
+<div class="modal-overlay" id="campaignModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="campaignModalTitle">Nova Campanha</div>
+      <button class="modal-close" data-dismiss-modal>✕</button>
+    </div>
+    <form id="campaignForm">
+      <input type="hidden" id="campaignIdHidden">
+      <div class="form-grid">
+        <div class="form-full">
+          <label class="form-label">Nome da Campanha *</label>
+          <input type="text" class="form-control" id="campName" placeholder="Ex: Promoção de Verão 2026">
+        </div>
+        <div class="form-full">
+          <label class="form-label">Título na página pública</label>
+          <input type="text" class="form-control" id="campTitle" placeholder="Gire e Ganhe!">
+        </div>
+        <div class="form-full">
+          <label class="form-label">Descrição</label>
+          <textarea class="form-control" id="campDesc" rows="2" placeholder="Breve descrição para os participantes"></textarea>
+        </div>
+        <div class="form-full">
+          <label class="form-label">Link do Grupo WhatsApp *</label>
+          <input type="url" class="form-control" id="campWaLink" placeholder="https://chat.whatsapp.com/...">
+        </div>
+        <div>
+          <label class="form-label">Data de Início</label>
+          <input type="date" class="form-control" id="campStartDate">
+        </div>
+        <div>
+          <label class="form-label">Data de Fim</label>
+          <input type="date" class="form-control" id="campEndDate">
+        </div>
+        <div>
+          <label class="form-label">Horário abertura loja</label>
+          <input type="time" class="form-control" id="campOpenTime" value="09:00">
+        </div>
+        <div>
+          <label class="form-label">Horário fechamento loja</label>
+          <input type="time" class="form-control" id="campCloseTime" value="18:00">
+        </div>
+        <div class="form-full" style="display:flex;align-items:center;gap:10px">
+          <label class="toggle"><input type="checkbox" id="campActive" checked><span class="toggle-slider"></span></label>
+          <span class="form-label" style="margin:0">Campanha ativa</span>
+        </div>
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" data-dismiss-modal>Cancelar</button>
+      <button class="btn btn-primary btn-sm" id="btnSaveCampaign">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Prêmio -->
+<div class="modal-overlay" id="prizeModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="prizeModalTitle">Novo Prêmio</div>
+      <button class="modal-close" data-dismiss-modal>✕</button>
+    </div>
+    <form id="prizeForm">
+      <input type="hidden" id="prizeIdHidden">
+      <div class="form-grid">
+        <div class="form-full">
+          <label class="form-label">Nome / Label na Roleta *</label>
+          <input type="text" class="form-control" id="prizeLabel" placeholder="Ex: Garrafa Térmica, 10% OFF, Tente Novamente">
+        </div>
+        <div>
+          <label class="form-label">Ícone (emoji)</label>
+          <input type="text" class="form-control" id="prizeIcon" placeholder="🎁" maxlength="4">
+        </div>
+        <div>
+          <label class="form-label">Cor do segmento</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input type="color" class="form-control" id="prizeColor" value="#6C3FC5" style="width:60px;height:40px;padding:4px">
+            <div id="prizeColorPreview" style="width:32px;height:32px;border-radius:50%;background:#6C3FC5;border:2px solid rgba(255,255,255,.2)"></div>
+          </div>
+        </div>
+        <div class="form-full">
+          <label class="form-label">Descrição (exibida ao ganhar)</label>
+          <input type="text" class="form-control" id="prizeDescription" placeholder="Retire na loja com o código acima">
+        </div>
+        <div class="form-full">
+          <label class="form-label">Instrução para o participante</label>
+          <input type="text" class="form-control" id="prizeInstruction" placeholder="Apresente ao caixa antes de sair">
+        </div>
+
+        <!-- Flags -->
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="toggle"><input type="checkbox" id="prizeIsPrize" checked><span class="toggle-slider"></span></label>
+          <span class="form-label" style="margin:0">É um prêmio real</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="toggle"><input type="checkbox" id="prizeIsFiller"><span class="toggle-slider"></span></label>
+          <span class="form-label" style="margin:0">Item de preenchimento</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="toggle"><input type="checkbox" id="prizeGenerateCode"><span class="toggle-slider"></span></label>
+          <span class="form-label" style="margin:0">Gerar código de resgate</span>
+        </div>
+
+        <div>
+          <label class="form-label">Tipo de resgate</label>
+          <select class="form-control" id="prizeRedemptionType">
+            <option value="show">Mostrar na tela</option>
+            <option value="code">Código único</option>
+            <option value="none">Nenhum</option>
+          </select>
+        </div>
+
+        <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:16px;grid-column:1/-1">
+          <h4 style="margin-bottom:12px;color:var(--accent)">⚙️ Controle Avançado de Distribuição</h4>
+        </div>
+
+        <div>
+          <label class="form-label">Estoque total</label>
+          <input type="number" class="form-control" id="prizeStockTotal" min="0" placeholder="0 = ilimitado">
+        </div>
+        <div>
+          <label class="form-label">Limite por dia</label>
+          <input type="number" class="form-control" id="prizeDailyLimit" min="0" placeholder="0 = ilimitado">
+        </div>
+        <div>
+          <label class="form-label">Intervalo mínimo (min)</label>
+          <input type="number" class="form-control" id="prizeMinInterval" min="0" placeholder="Ex: 30">
+          <small style="color:var(--text-muted)">Tempo mínimo entre saídas deste prêmio</small>
+        </div>
+        <div>
+          <label class="form-label">Peso na roleta (1-100)</label>
+          <input type="number" class="form-control" id="prizeWeight" min="1" max="100" value="10">
+          <small style="color:var(--text-muted)">Maior = mais espaço visual</small>
+        </div>
+        <div>
+          <label class="form-label">Horário permitido (início)</label>
+          <input type="time" class="form-control" id="prizeAllowedFrom" placeholder="09:00">
+        </div>
+        <div>
+          <label class="form-label">Horário permitido (fim)</label>
+          <input type="time" class="form-control" id="prizeAllowedUntil" placeholder="18:00">
+        </div>
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" data-dismiss-modal>Cancelar</button>
+      <button class="btn btn-primary btn-sm" id="btnSavePrize">💾 Salvar Prêmio</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal QR Code -->
+<div class="modal-overlay" id="qrModal">
+  <div class="modal" style="max-width:400px;text-align:center">
+    <div class="modal-header">
+      <div class="modal-title">📱 QR Code da Campanha</div>
+      <button class="modal-close" data-dismiss-modal>✕</button>
+    </div>
+    <img id="qrImage" src="" alt="QR Code" style="border-radius:12px;max-width:260px;display:none">
+    <p class="qr-url" id="qrUrl"></p>
+    <div class="modal-footer" style="justify-content:center;gap:12px">
+      <button class="btn btn-secondary btn-sm" id="qrCopyBtn">📋 Copiar URL</button>
+      <button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ Imprimir</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container"></div>
+
+<script src="js/roulette.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
