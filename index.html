@@ -1,38 +1,145 @@
 <!DOCTYPE html>
-  <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Site</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      text-align: center;
-}
-    .container {
-            padding: 40px;
-}
-    h1 {
-            font-size: 3rem;
-      margin-bottom: 10px;
-}
-    p {
-            font-size: 1.2rem;
-      opacity: 0.9;
-}
-  </style>
-    </head>
-    <body>
-      <div class="container">
-        <h1>Bem-vindo ao meu site!</h1>
-    <p>Este site foi criado com GitHub Pages.</p>
-  </div>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gire e Ganhe!</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- CONFIG: edite config.js com suas credenciais do Supabase -->
+  <script src="js/config.js"></script>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo">🎰 Gire &amp; Ganhe</div>
+  <div class="campaign-name" id="campaignName"></div>
+</header>
+
+<!-- MAIN -->
+<div class="container">
+  <div class="card-glass">
+
+    <!-- INDICADOR DE PASSOS -->
+    <div class="steps-indicator">
+      <div class="step-dot active" title="Seu número"></div>
+      <div class="step-dot" title="WhatsApp"></div>
+      <div class="step-dot" title="Roleta"></div>
+      <div class="step-dot" title="Resultado"></div>
+    </div>
+
+    <!-- ====== PASSO 1: TELEFONE ====== -->
+    <div class="phone-step active" id="phoneStep">
+      <div class="step-icon">📱</div>
+      <h1 class="step-title">Participe da Promoção!</h1>
+      <p class="step-desc" id="campaignDesc">Gire a roleta e concorra a prêmios incríveis.<br>Informe seu número de celular para começar.</p>
+
+      <div class="input-group">
+        <label for="phoneInput">Seu celular (com DDD)</label>
+        <input type="tel" id="phoneInput" class="input-field" placeholder="(11) 99999-9999" maxlength="15" inputmode="numeric">
+        <div class="input-error" id="phoneError"></div>
+      </div>
+
+      <button class="btn btn-primary" id="btnCheckPhone">Continuar →</button>
+    </div>
+
+    <!-- ====== PASSO COOLDOWN ====== -->
+    <div class="phone-step" id="cooldownStep">
+      <div class="step-icon">⏳</div>
+      <h2 class="step-title">Volte em Breve!</h2>
+      <p class="step-desc">Você já participou hoje. Sua próxima jogada estará disponível em:</p>
+      <div style="text-align:center;font-size:2.5rem;font-weight:800;color:var(--accent);margin:20px 0" id="cooldownTime">--h --min</div>
+      <p class="step-desc">Cada número pode participar uma vez a cada 24 horas.</p>
+      <button class="btn btn-secondary" onclick="showStep('phone');document.getElementById('phoneInput').value=''">← Voltar</button>
+    </div>
+
+    <!-- ====== PASSO 2: WHATSAPP ====== -->
+    <div class="whatsapp-step" id="whatsappStep">
+      <div class="step-icon">💬</div>
+      <h2 class="step-title">Entre no Grupo!</h2>
+      <p class="step-desc">
+        Para girar a roleta, entre no nosso grupo exclusivo do WhatsApp.<br>
+        <strong id="campaignNameWhats"></strong><br>
+        Assim que você entrar, a roleta será liberada automaticamente!
+      </p>
+
+      <div class="status-bar info" id="whatsappStatus" style="display:none">
+        <span class="status-dot"></span>
+        <span>Clique no botão abaixo para abrir o grupo.</span>
+      </div>
+
+      <button class="btn btn-whatsapp" id="btnOpenWhatsApp">
+        📲 Entrar no Grupo do WhatsApp
+      </button>
+
+      <p style="text-align:center;color:var(--text-muted);font-size:0.8rem;margin-top:16px">
+        O sistema verificará automaticamente sua entrada no grupo.<br>
+        Não feche esta página!
+      </p>
+    </div>
+
+    <!-- ====== PASSO 3: ROLETA ====== -->
+    <div class="roulette-step" id="rouletteStep">
+
+      <!-- Countdown -->
+      <div id="countdownSection">
+        <div class="countdown-overlay">
+          <p class="countdown-text">Preparando sua roleta...</p>
+          <div class="countdown-number" id="countdownNumber">5</div>
+          <p class="countdown-text">Segure firme! 🎉</p>
+        </div>
+      </div>
+
+      <!-- Roleta -->
+      <div id="rouletteSection" style="display:none">
+        <h2 class="step-title" style="margin-bottom:4px">É a sua vez!</h2>
+        <p class="step-desc" style="margin-bottom:16px">Clique no botão e gire a roleta!</p>
+
+        <div class="roulette-wrapper">
+          <div class="roulette-pointer">▼</div>
+          <canvas id="rouletteCanvas"></canvas>
+        </div>
+
+        <div class="spin-btn-wrapper" style="margin-top:20px">
+          <button class="btn btn-primary" id="btnSpin">🎰 GIRAR ROLETA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== PASSO 4: RESULTADO ====== -->
+    <div class="result-step" id="resultStep">
+      <div class="result-card">
+        <div class="result-icon" id="resultIcon">🎉</div>
+        <div class="result-prize" id="resultPrize">Parabéns!</div>
+        <p class="result-desc" id="resultDesc"></p>
+
+        <div class="result-code" id="resultCodeSection" style="display:none">
+          <div class="result-code-label">Seu código de resgate:</div>
+          <div class="result-code-value" id="resultCode"></div>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">
+            Apresente este código ao atendente para retirar seu prêmio.
+          </p>
+        </div>
+
+        <div class="status-bar info" id="resultInstruction" style="display:none">
+          <span class="status-dot"></span>
+          <span></span>
+        </div>
+
+        <p class="result-timer" id="resultNextPlay"></p>
+
+        <button class="btn btn-secondary" style="margin-top:16px"
+          onclick="location.reload()">Jogar Novamente (próximo dia)</button>
+      </div>
+    </div>
+
+  </div><!-- /card-glass -->
+</div><!-- /container -->
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container"></div>
+
+<script src="js/roulette.js"></script>
+<script src="js/app.js"></script>
 </body>
-    </html>
+</html>
